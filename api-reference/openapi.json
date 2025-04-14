@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
+    "title": "Toolrouter API",
+    "description": "Toolrouter API for secure endpoint integration",
     "license": {
       "name": "MIT"
     },
@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.toolrouter.ai"
     }
   ],
   "security": [
@@ -19,29 +19,85 @@
     }
   ],
   "paths": {
-    "/plants": {
+    "/s/{client_id}/list_tools": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "description": "Returns all tools from the system that the user has access to",
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
+            "name": "client_id",
+            "in": "path",
+            "description": "Client ID for authentication",
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
+            }
+          },
+          {
+            "name": "schema",
+            "in": "query",
+            "description": "Optional schema format (e.g., 'openai')",
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "List of available tools",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "tools": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Name of the tool"
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "Description of the tool's functionality"
+                          },
+                          "inputSchema": {
+                            "type": "object",
+                            "description": "JSON schema defining the tool's input parameters"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "response": {
+                    "value": {
+                      "tools": [
+                        {
+                          "name": "google-calendar_list_events",
+                          "description": "List calendar events within a specified time range",
+                          "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                              "timeMin": {
+                                "type": "string",
+                                "description": "Start time (ISO string)"
+                              },
+                              "timeMax": {
+                                "type": "string",
+                                "description": "End time (ISO string)"
+                              },
+                              "maxResults": {
+                                "type": "number",
+                                "description": "Maximum number of events to return"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -56,35 +112,9 @@
                 }
               }
             }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
           },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +126,96 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/s/{client_id}/call_tool": {
+      "post": {
+        "description": "Executes a specific tool with the provided parameters",
         "parameters": [
           {
-            "name": "id",
+            "name": "client_id",
             "in": "path",
-            "description": "ID of plant to delete",
+            "description": "Client ID for authentication",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           }
         ],
+        "requestBody": {
+          "description": "Tool execution details",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["tool_name", "tool_input"],
+                "properties": {
+                  "tool_name": {
+                    "type": "string",
+                    "description": "Name of the tool to execute"
+                  },
+                  "tool_input": {
+                    "type": "object",
+                    "description": "Parameters for the tool execution, structure depends on the specific tool"
+                  }
+                }
+              },
+              "examples": {
+                "search": {
+                  "value": {
+                    "tool_name": "exa_search",
+                    "tool_input": {
+                      "query": "What is toolrouter AI ?"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Tool execution result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "description": "The result of the tool execution"
+                    }
+                  }
+                },
+                "examples": {
+                  "response": {
+                    "value": {
+                      "result": {
+                        "search_results": [
+                          {
+                            "title": "Toolrouter AI Platform",
+                            "content": "Toolrouter is an AI integration platform that helps connect various tools and services securely.",
+                            "url": "https://toolrouter.ai/about"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
             "content": {
               "application/json": {
                 "schema": {
@@ -127,90 +225,6 @@
             }
           }
         }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
       }
     }
   }

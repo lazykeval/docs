@@ -1,33 +1,48 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'A quick Introduction to Toolrouter & Secure Endpoints'
 ---
 
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  You need to create secure endpoints to connect your code to Toolrouter.
 </Note>
 
 ## Welcome
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+To create a secure endpoint:
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+1. Create a new Stack
+2. Click on "Secure Client for Development"
+3. Click on "+ Create Secure Client"
+4. Copy URL and Token
+5. Use the URL and Token to connect your code to Toolrouter
 
-## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+  <img
+    src="/images/secure_client_creds.png"
+    alt="Secure Client Credentials"
+    className="h-30"
+  />
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
-```
+## Available Endpoints
+
+Toolrouter provides the following secure endpoints for your integration:
+<CardGroup cols={2}>
+  <Card
+    title="List Tools Endpoint"
+    icon="list"
+    href="/api-reference/endpoint/list_tools"
+  >
+    Get a list of all available tools in your stack
+  </Card>
+  <Card
+    title="Call Tool Endpoint"
+    icon="play"
+    href="/api-reference/endpoint/call_tool"
+  >
+    Execute a specific tool with your parameters
+  </Card>
+</CardGroup>
+
+Each endpoint is designed to securely connect your application with Toolrouter services. Refer to the specific documentation for detailed usage instructions.
+
