@@ -13,6 +13,16 @@
       "url": "https://api.toolrouter.ai"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter your Stack token"
+      }
+    }
+  },
   "security": [
     {
       "bearerAuth": []
@@ -22,6 +32,11 @@
     "/s/{client_id}/list_tools": {
       "get": {
         "description": "Returns all tools from the system that the user has access to",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "client_id",
@@ -135,6 +150,11 @@
     "/s/{client_id}/call_tool": {
       "post": {
         "description": "Executes a specific tool with the provided parameters",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "client_id",

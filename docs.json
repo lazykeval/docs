@@ -37,14 +37,7 @@
                   "clients/cursor",
                   "clients/windsurf",
                   "clients/cline",
-                  "clients/vscode",
-                  "clients/copilot"
-                ]
-              },
-              {
-                "group": "Additional Clients",
-                "pages": [
-                  "clients/custom-integration"
+                  "clients/vscode"
                 ]
               }
             ]

@@ -1,0 +1,31 @@
+---
+title: 'Claude Integration'
+description: 'Learn how to integrate Claude with ToolRouter'
+---
+
+This guide will walk you through integrating Cursor with ToolRouter to enable tool use capabilities.
+
+Cursor Official Documentation: https://docs.cursor.com/context/model-context-protocol
+
+## Setup
+
+Create a ToolRouter Stack -> Create SSE Client -> Copy Cursor Implementation code
+
+<img src="/images/integration/cursor/0.png" alt="Cursor 1" />
+
+Go to Cursor -> Settings -> Cursor Settings
+
+<img src="/images/integration/cursor/1.png" alt="Cursor 2" />
+
+Go to the MCP tab and click on "Add new Global MCP Server"
+
+<img src="/images/integration/cursor/2.png" alt="Cursor 3" />
+
+Paste the copied implementation code into the `mcp.json` file. All available tools will be shown in the MCP Server page.
+
+<img src="/images/integration/cursor/3.png" alt="Cursor 4" />
+
+Now, you can use Cursor's Agentic mode to make use of all MCP tools.
+
+<img src="/images/integration/cursor/4.png" alt="Cursor 5" />
+

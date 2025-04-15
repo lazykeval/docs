@@ -1,0 +1,32 @@
+---
+title: 'VS Code / Copilot Integration'
+description: 'Learn how to integrate VS Code with ToolRouter'
+---
+
+This guide will walk you through integrating VS Code with ToolRouter to enable tool use capabilities.
+
+## Setup
+
+Create a ToolRouter Stack -> Create SSE Client -> Copy VS Code Implementation code
+
+<img src="/images/integration/vscode/0.png" alt="VS Code 1" />
+
+Open VS Code and press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux) to open the Command Palette. Search for "MCP: Add Server" and select it.
+
+<img src="/images/integration/vscode/1.png" alt="VS Code 2" />
+
+Choose MCP: Add Server -> HTTP (server-sent events)
+
+<img src="/images/integration/vscode/2.png" alt="VS Code 3" />
+
+Enter the SSE URL copied from the ToolRouter Implementation code
+
+<img src="/images/integration/vscode/3.png" alt="VS Code 4" />
+
+Enter a suitable name for the server
+
+<img src="/images/integration/vscode/4.png" alt="VS Code 5" />
+
+You should now see all the tools available in the ToolRouter stack.
+
+

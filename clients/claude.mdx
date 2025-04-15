@@ -1,1 +1,36 @@
-Hello
+---
+title: 'Claude Integration'
+description: 'Learn how to integrate Claude with ToolRouter'
+---
+
+This guide will walk you through integrating Claude with ToolRouter to enable tool use capabilities.
+
+Claude Official Documentation: https://modelcontextprotocol.io/quickstart/user
+
+## Setup
+
+Create a ToolRouter Stack -> Create SSE Client -> Copy Claude Implementation code
+
+<img src="/images/integration/claude/0.png" alt="Claude 1" />
+
+Open Claude Settings, or open Claude and press (⌘,)
+
+<img src="/images/integration/claude/1.png" alt="Claude 2" />
+
+Go to "Developer" and then "Edit Config", It will take you to the location of `claude_desktop_config.json` File.
+
+<img src="/images/integration/claude/2.png" alt="Claude 3" />
+
+Open the `claude_desktop_config.json` File and paste the copied implementation code.
+
+<img src="/images/integration/claude/3.png" alt="Claude 4" />
+
+Restart Claude to apply the changes. You will see a Hammer icon with number of tools added.
+
+<img src="/images/integration/claude/4.png" alt="Claude 5" />
+
+Click on the Hammer icon to see all available tools.
+
+<img src="/images/integration/claude/5.png" alt="Claude 6" />
+
+You can now use the Toolrouter tools in Claude.
