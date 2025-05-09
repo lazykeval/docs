@@ -1,0 +1,138 @@
+---
+title: 'Python SDK & Examples'
+description: 'Learn how to use the Toolrouter API with Python'
+---
+
+Below are examples of how to use the Toolrouter API with Python.
+
+Official Python SDK: [toolrouter](https://pypi.org/project/toolrouter/)
+
+## Installation
+```bash
+pip install toolrouter
+```
+
+## With OpenAI
+
+```python
+from toolrouter import ToolRouter
+
+from openai import OpenAI
+import json
+
+toolrouter_client_id = "<>"
+toolrouter_token = "<>"
+
+toolr = ToolRouter(toolrouter_client_id, toolrouter_token)
+
+client = OpenAI()
+
+user_query = "What's my last email from my gmail account?"
+
+messages = [{"role": "user", "content": user_query}]
+
+completion = client.chat.completions.create(
+    model="gpt-4.1",
+    messages=messages,
+    tools=toolr.list_tools(schema="openai")
+)
+
+results = []
+
+for tool_call in completion.choices[0].message.tool_calls:
+    name = tool_call.function.name
+    args = json.loads(tool_call.function.arguments)
+
+    result = toolr.call_tool(name, args)
+    results.append(result)
+    messages.append({
+        "role": "tool",
+        "tool_call_id": tool_call.id,
+        "content": str(result)
+    })
+
+print(results)
+```
+
+## With Anthropic
+
+```python
+from anthropic import Anthropic
+from toolrouter import ToolRouter
+
+# Initialize clients
+client = Anthropic(api_key="<your-anthropic-api-key>")
+toolr = ToolRouter("<toolrouter-client-id>", "<toolrouter-token>")
+
+# Create a message with Claude
+message = client.messages.create(
+    model="claude-3-5-sonnet-20240620",
+    max_tokens=1000,
+    messages=[{"role": "user", "content": "What's my last email from my gmail account?"}],
+    tools=toolr.list_tools(schema="anthropic")
+)
+
+# Process tool calls if any
+results = []
+has_tool_use = False
+
+for content_item in message.content:
+    if hasattr(content_item, 'type') and content_item.type == "tool_use":
+        has_tool_use = True
+        name = content_item.name
+        args = content_item.input
+        
+        result = toolr.call_tool(name, args)
+        results.append(result)
+        
+        print(f"Tool used: {name}")
+        print(f"Result: {result}")
+
+if not has_tool_use:
+    # If no tools were called, print the text response
+    for content_item in message.content:
+        if hasattr(content_item, 'type') and content_item.type == "text":
+            print(f"Response: {content_item.text}")
+```
+
+
+## With OpenRouter
+
+```python
+from openai import OpenAI
+import json
+from toolrouter import ToolRouter
+
+# Initialize OpenAI client with OpenRouter base URL
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="<your-openrouter-api-key>"
+)   
+
+# Initialize ToolRouter
+toolr = ToolRouter("<your-toolrouter-client-id>", "<your-toolrouter-token>")
+
+# Get available tools in OpenAI format
+tools = toolr.list_tools(schema="openai")
+
+# Make a chat completion request
+completion = client.chat.completions.create(
+    model="meta-llama/llama-4-maverick",
+    messages=[{"role": "user", "content": "What's my last email from my gmail account?"}],
+    tools=tools
+)
+
+# Process any tool calls that were made
+results = []
+if hasattr(completion.choices[0].message, 'tool_calls') and completion.choices[0].message.tool_calls:
+    for tool_call in completion.choices[0].message.tool_calls:
+        name = tool_call.function.name
+        args = json.loads(tool_call.function.arguments)
+        
+        result = toolr.call_tool(name, args)
+        results.append(result)
+        
+    print("Tool results:", results)
+else:
+    print("Response:", completion.choices[0].message.content)
+```

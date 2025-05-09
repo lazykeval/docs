@@ -1,0 +1,151 @@
+---
+title: 'TypeScript SDK & Examples'
+description: 'Learn how to use the Toolrouter API with TypeScript'
+---
+
+
+Below are examples of how to use the Toolrouter API with TypeScript.
+
+Official TypeScript SDK: [toolrouter](https://www.npmjs.com/package/toolrouter)
+
+## Installation
+```bash
+npm install toolrouter
+```
+
+## With OpenAI
+
+```typescript
+import OpenAI from 'openai';
+import { ToolRouter } from 'toolrouter';
+
+async function main() {
+  const toolr = new ToolRouter("YOUR_CLIENT_ID", "YOUR_API_KEY");
+  const client = new OpenAI({ apiKey: "YOUR_OPENAI_KEY" });
+
+  const messages = [{ 
+    role: "user", 
+    content: "What's my last email from my gmail account?" 
+  }];
+
+  const completion = await client.chat.completions.create({
+    model: "gpt-4.1",
+    messages,
+    tools: await toolr.listTools("openai"),
+  });
+
+  const results: any[] = [];
+  if (completion.choices[0].message.tool_calls) {
+    for (const tool_call of completion.choices[0].message.tool_calls) {
+      const result = await toolr.callTool(
+        tool_call.function.name,
+        JSON.parse(tool_call.function.arguments)
+      );
+      results.push(result.content);
+      messages.push({ role: "tool", content: String(result) });
+    }
+  }
+
+  console.log(results);
+}
+
+main().catch(console.error);
+```
+
+## With Anthropic
+
+```typescript
+import Anthropic from '@anthropic-ai/sdk';
+import { ToolRouter } from 'toolrouter';
+
+async function main() {
+  // Initialize clients
+  const anthropic = new Anthropic({
+    apiKey: "YOUR_ANTHROPIC_API_KEY"
+  });
+
+  const toolr = new ToolRouter("YOUR_CLIENT_ID", "YOUR_API_KEY");
+
+  // Get available tools
+  const tools = await toolr.listTools("anthropic");
+
+  // Create a message with Claude
+  const message = await anthropic.messages.create({
+    model: "claude-3-sonnet",
+    max_tokens: 1000,
+    messages: [{ role: "user", content: "What's my last email from my gmail account?" }],
+    tools: tools,
+  });
+
+  // Process tool calls if any
+  const results: any[] = [];
+  let has_tool_use = false;
+
+  for (const contentItem of message.content) {
+    if (contentItem.type === "tool_use") {
+      has_tool_use = true;
+      const name = contentItem.name;
+      const args = contentItem.input as Record<string, any>;
+      
+      const result = await toolr.callTool(name, args);
+      results.push(result);
+      
+      console.log(`Tool used: ${name}`);
+      console.log(`Result: ${JSON.stringify(result)}`);
+    }
+  }
+
+  if (!has_tool_use) {
+    // If no tools were called, print the text response
+    for (const contentItem of message.content) {
+      if (contentItem.type === "text") {
+        console.log(`Response: ${contentItem.text}`);
+      }
+    }
+  }
+}
+
+main().catch(console.error);
+```
+
+
+## With OpenRouter
+
+```typescript
+import OpenAI from 'openai';
+import { ToolRouter } from 'toolrouter';
+
+async function main() {
+  // Initialize clients
+  const client = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: "YOUR_OPENROUTER_API_KEY"
+  });
+
+  const toolr = new ToolRouter("YOUR_CLIENT_ID", "YOUR_API_KEY");
+
+  // Get available tools and make completion
+  const tools = await toolr.listTools("openai");
+  const completion = await client.chat.completions.create({
+    model: "meta-llama/llama-4-maverick",
+    messages: [{ role: "user", content: "What's my last email?" }],
+    tools: tools
+  });
+
+  // Handle tool calls or text response
+  if (completion.choices[0].message.tool_calls) {
+    const results = await Promise.all(completion.choices[0].message.tool_calls.map(async tool_call => {
+      const result = await toolr.callTool(
+        tool_call.function.name,
+        JSON.parse(tool_call.function.arguments)
+      );
+      return result.content;
+    }));
+    console.log("Tool results:", results);
+  } else {
+    console.log("Response:", completion.choices[0].message.content);
+  }
+}
+
+main().catch(console.error);
+```

@@ -54,10 +54,17 @@
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "Endpoints",
             "pages": [
               "api-reference/endpoint/list_tools",
               "api-reference/endpoint/call_tool"
+            ]
+          },
+          {
+            "group": "SDK",
+            "pages": [
+              "api-reference/sdk/python",
+              "api-reference/sdk/typescript"
             ]
           }
         ]
