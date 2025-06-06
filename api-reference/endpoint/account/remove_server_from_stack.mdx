@@ -1,0 +1,175 @@
+---
+title: 'Remove Server from Stack'
+description: 'Remove a server and its tools from your stack'
+---
+
+## Overview
+
+Removes a server from an existing stack. This will disable all tools from that server and remove any associated credentials from the stack.
+
+<Warning>
+  Removing a server will permanently delete its credentials from the stack. You'll need to re-add the credentials if you add the server back later.
+</Warning>
+
+## Endpoint
+
+```
+DELETE https://api.toolrouter.ai/v1/stacks/{stack_id}/servers/{server_id}
+```
+
+## Authentication
+
+This endpoint requires an API key. Include it in the Authorization header:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Path Parameters
+
+<ParamField path="stack_id" type="string" required>
+  The unique identifier of the stack containing the server
+</ParamField>
+
+<ParamField path="server_id" type="string" required>
+  The unique identifier of the server to remove from the stack
+</ParamField>
+
+## Response
+
+<ResponseField name="message" type="string">
+  Confirmation message indicating the server was removed successfully
+</ResponseField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.delete(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail",
+    headers=headers
+)
+
+result = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+});
+
+const result = await response.json();
+```
+
+</CodeGroup>
+
+## Example Response
+
+```json
+{
+  "message": "Server gmail removed from stack stack_123e4567-e89b-12d3-a456-426614174000"
+}
+```
+
+## What Gets Removed
+
+When you remove a server from a stack:
+
+- **Server association**: The server is removed from the stack's server list
+- **Tool access**: All tools from that server become unavailable
+- **Credentials**: All stored credentials for this server are permanently deleted
+- **Configuration**: Any server-specific configuration is removed
+
+<Note>
+  The server itself remains available in the marketplace and can be re-added to this or other stacks at any time.
+</Note>
+
+## Impact on Applications
+
+Removing a server will immediately affect any applications using tools from that server:
+
+- **Tool calls will fail**: Applications calling tools from the removed server will receive errors
+- **Stack tools endpoint**: The removed server's tools will no longer appear in the stack's tool list
+- **Secure endpoints**: Any secure client endpoints using these tools will return errors
+
+## Recovery
+
+If you accidentally remove a server:
+
+1. **Re-add the server**: Use the [Add Server to Stack](/api-reference/endpoint/account/add_server_to_stack) endpoint
+2. **Re-configure credentials**: Use the [Update Credentials](/api-reference/endpoint/account/update_credentials) endpoint 
+3. **Re-enable tools**: Use the [Update Server Tools](/api-reference/endpoint/account/update_server_tools) endpoint
+4. **Test functionality**: Verify all tools work as expected
+
+## Error Responses
+
+<ResponseField name="401 Unauthorized">
+  Invalid or missing API key
+  
+  ```json
+  {
+    "detail": "Unauthorized"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="404 Not Found">
+  Stack not found or server not found in stack
+  
+  ```json
+  {
+    "detail": "Stack not found"
+  }
+  ```
+  
+  ```json
+  {
+    "detail": "Server gmail not found in stack stack_123e4567-e89b-12d3-a456-426614174000"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="429 Too Many Requests">
+  Rate limit exceeded
+  
+  ```json
+  {
+    "detail": "Too many requests"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  Server error occurred
+  
+  ```json
+  {
+    "detail": "Failed to remove server from stack"
+  }
+  ```
+</ResponseField>
+
+## Best Practices
+
+Before removing a server:
+
+1. **Check usage**: Verify no applications are actively using tools from this server
+2. **Backup credentials**: Note down any important credential information if needed
+3. **Consider disabling instead**: You might want to disable tools rather than removing the entire server
+4. **Plan for downtime**: Applications will experience immediate failures for tools from the removed server
+</rewritten_file> 

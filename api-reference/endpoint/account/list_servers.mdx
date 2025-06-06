@@ -1,0 +1,301 @@
+---
+title: 'List Servers'
+description: 'Retrieve all available servers from the ToolRouter marketplace'
+---
+
+## Overview
+
+Returns a list of all available servers in the ToolRouter marketplace. These servers contain various tools that you can add to your stacks and use in your applications.
+
+## Endpoint
+
+```
+GET https://api.toolrouter.ai/v1/servers
+```
+
+## Authentication
+
+This endpoint requires an API key. Include it in the Authorization header:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Response
+
+<ResponseField name="servers" type="array">
+  Array of available server objects
+  
+  <Expandable title="Server Object">
+    <ResponseField name="server_id" type="string">
+      Unique identifier for the server
+    </ResponseField>
+    
+    <ResponseField name="name" type="string">
+      Human-readable name of the server
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Description of the server's functionality
+    </ResponseField>
+    
+    <ResponseField name="tools" type="array">
+      Array of tools available in this server
+      
+      <Expandable title="Tool Object">
+        <ResponseField name="tool_id" type="string">
+          Unique identifier for the tool
+        </ResponseField>
+        
+        <ResponseField name="name" type="string">
+          Name of the tool
+        </ResponseField>
+        
+        <ResponseField name="description" type="string">
+          Description of the tool's functionality
+        </ResponseField>
+        
+        <ResponseField name="parameters" type="object">
+          JSON schema defining the tool's input parameters
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="required_credentials" type="array">
+      Array of required credential fields for this server
+      
+      <Expandable title="Credential Object">
+        <ResponseField name="field_id" type="string">
+          Unique identifier for the credential field
+        </ResponseField>
+        
+        <ResponseField name="name" type="string">
+          Human-readable name of the credential
+        </ResponseField>
+        
+        <ResponseField name="description" type="string">
+          Description of what this credential is used for
+        </ResponseField>
+        
+        <ResponseField name="required" type="boolean">
+          Whether this credential is required (always true for required_credentials)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="optional_credentials" type="array">
+      Array of optional credential fields for this server
+      
+      <Expandable title="Credential Object">
+        <ResponseField name="field_id" type="string">
+          Unique identifier for the credential field
+        </ResponseField>
+        
+        <ResponseField name="name" type="string">
+          Human-readable name of the credential
+        </ResponseField>
+        
+        <ResponseField name="description" type="string">
+          Description of what this credential is used for
+        </ResponseField>
+        
+        <ResponseField name="required" type="boolean">
+          Whether this credential is required (always false for optional_credentials)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.toolrouter.ai/v1/servers" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+response = requests.get(
+    "https://api.toolrouter.ai/v1/servers",
+    headers=headers
+)
+
+servers = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.toolrouter.ai/v1/servers', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  }
+});
+
+const servers = await response.json();
+```
+
+</CodeGroup>
+
+## Example Response
+
+```json
+[
+  {
+    "server_id": "gmail",
+    "name": "Gmail Server",
+    "description": "Integration with Gmail for email management",
+    "tools": [
+      {
+        "tool_id": "gmail_send_email",
+        "name": "Send Email",
+        "description": "Send an email through Gmail",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "to": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "List of recipient email addresses"
+            },
+            "subject": {
+              "type": "string",
+              "description": "Email subject"
+            },
+            "body": {
+              "type": "string",
+              "description": "Email body content"
+            }
+          },
+          "required": ["to", "subject", "body"]
+        }
+      },
+      {
+        "tool_id": "gmail_search_emails",
+        "name": "Search Emails",
+        "description": "Search for emails using Gmail search syntax",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Gmail search query"
+            },
+            "maxResults": {
+              "type": "number",
+              "description": "Maximum number of results to return"
+            }
+          },
+          "required": ["query"]
+        }
+      }
+    ],
+    "required_credentials": [
+      {
+        "field_id": "gmail_oauth_token",
+        "name": "Gmail OAuth Token",
+        "description": "OAuth token for Gmail API access",
+        "required": true
+      }
+    ],
+    "optional_credentials": [
+      {
+        "field_id": "gmail_signature",
+        "name": "Email Signature",
+        "description": "Default signature to append to emails",
+        "required": false
+      }
+    ]
+  },
+  {
+    "server_id": "linear",
+    "name": "Linear",
+    "description": "Project management and issue tracking with Linear",
+    "tools": [
+      {
+        "tool_id": "linear_create_issue",
+        "name": "Create Issue",
+        "description": "Create a new issue in Linear",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Issue title"
+            },
+            "description": {
+              "type": "string",
+              "description": "Issue description"
+            },
+            "teamId": {
+              "type": "string",
+              "description": "Team ID"
+            }
+          },
+          "required": ["title", "teamId"]
+        }
+      }
+    ],
+    "required_credentials": [
+      {
+        "field_id": "linear_api_key",
+        "name": "Linear API Key",
+        "description": "API key for Linear integration",
+        "required": true
+      }
+    ],
+    "optional_credentials": []
+  }
+]
+```
+
+## Use Cases
+
+This endpoint is useful for:
+
+- **Discovering available integrations**: See all servers and tools available in the marketplace
+- **Understanding tool capabilities**: Review tool parameters and descriptions before adding to stacks
+- **Planning stack configuration**: Determine which servers and tools to include in your stacks
+- **Credential planning**: Understand what credentials you'll need to set up before adding servers
+
+## Error Responses
+
+<ResponseField name="401 Unauthorized">
+  Invalid or missing API key
+  
+  ```json
+  {
+    "detail": "Unauthorized"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="429 Too Many Requests">
+  Rate limit exceeded
+  
+  ```json
+  {
+    "detail": "Too many requests"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  Server error occurred
+  
+  ```json
+  {
+    "detail": "Failed to get servers"
+  }
+  ```
+</ResponseField> 

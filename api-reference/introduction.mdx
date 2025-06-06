@@ -1,32 +1,44 @@
 ---
 title: 'Introduction'
-description: 'A quick Introduction to Toolrouter & Secure Endpoints'
+description: 'A comprehensive guide to ToolRouter APIs'
 ---
-
-<Note>
-  You need to create secure endpoints to connect your code to Toolrouter.
-</Note>
 
 ## Welcome
 
-To create a secure endpoint:
+ToolRouter provides two types of API endpoints to serve different use cases:
 
-1. Create a new Stack
+### 1. Stack Specific Endpoints
+
+These endpoints use stack tokens and are designed for application integration:
+
+1. Create a new Stack in the dashboard
 2. Click on "Use with API"
 3. Click on "+ Create Secure Client"
 4. Copy URL and Token
-5. Use the URL and Token to connect your code to Toolrouter
+5. Use the URL and Token to connect your code to ToolRouter
 
+<img
+  src="/images/secure_client_creds.png"
+  alt="Secure Client Credentials"
+  className="h-30"
+/>
 
-  <img
-    src="/images/secure_client_creds.png"
-    alt="Secure Client Credentials"
-    className="h-30"
-  />
+### 2. Account Management API
+
+These endpoints use API keys and provide programmatic control over your ToolRouter account:
+
+1. Log into your [ToolRouter Dashboard](https://app.toolrouter.ai)
+2. Navigate to your account settings  
+3. Generate a new API key
+4. Use the API key to manage stacks, servers, and tools programmatically
+
+<Warning>
+  Screenshot placeholder: API key generation interface
+</Warning>
 
 ## Available Endpoints
 
-Toolrouter provides the following secure endpoints for your integration:
+### Stack Specific Endpoints
 <CardGroup cols={2}>
   <Card
     title="List Tools Endpoint"
@@ -44,5 +56,60 @@ Toolrouter provides the following secure endpoints for your integration:
   </Card>
 </CardGroup>
 
-Each endpoint is designed to securely connect your application with Toolrouter services. Refer to the specific documentation for detailed usage instructions.
+### Account Management API
+
+<CardGroup cols={2}>
+  <Card
+    title="Authentication Guide"
+    icon="key"
+    href="/api-reference/endpoint/account/authentication"
+  >
+    Learn how to authenticate with the Account Management API
+  </Card>
+  <Card
+    title="Stack Management"
+    icon="layer-group"
+    href="/api-reference/endpoint/account/list_stacks"
+  >
+    Create, update, delete, and list your stacks
+  </Card>
+  <Card
+    title="Server Management"
+    icon="server"
+    href="/api-reference/endpoint/account/list_servers"
+  >
+    Add servers from the marketplace to your stacks
+  </Card>
+  <Card
+    title="Credentials Management"
+    icon="lock"
+    href="/api-reference/endpoint/account/get_credentials_status"
+  >
+    Securely manage credentials for your integrations
+  </Card>
+  <Card
+    title="Tools Management"
+    icon="wrench"
+    href="/api-reference/endpoint/account/list_stack_tools"
+  >
+    List and invoke tools from your stacks
+  </Card>
+</CardGroup>
+
+## Key Differences
+
+| Feature | Stack Specific Endpoints | Account Management API |
+|---------|--------------------------|------------------------|
+| **Authentication** | Stack token | API key |
+| **Purpose** | Application integration | Account management |
+| **Base URL** | `api.toolrouter.ai/s/{client_id}` | `api.toolrouter.ai/v1` |
+| **Use Case** | Runtime tool execution | Stack configuration |
+| **Rate Limits** | Per stack | Per account |
+
+## Getting Started
+
+- **For application integration**: Start with [Stack Specific Endpoints](#stack-specific-endpoints)
+- **For account automation**: Start with [Account Management API](#account-management-api)
+
+Each endpoint is designed to securely connect your application with ToolRouter services. Refer to the specific documentation for detailed usage instructions.
 

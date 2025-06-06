@@ -1,0 +1,472 @@
+---
+title: 'List Stack Tools'
+description: 'Retrieve all enabled tools from a stack in various formats'
+---
+
+## Overview
+
+Returns a list of all enabled tools from a specific stack. This endpoint supports multiple schema formats to match different AI framework requirements, including OpenAI and Anthropic formats.
+
+## Endpoint
+
+```
+GET https://api.toolrouter.ai/v1/stacks/{stack_id}/tools
+```
+
+## Authentication
+
+This endpoint requires an API key. Include it in the Authorization header:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Path Parameters
+
+<ParamField path="stack_id" type="string" required>
+  The unique identifier of the stack to get tools from
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="schema" type="string" default="default">
+  The schema format for the returned tools
+  
+  <Expandable title="Available Schema Formats">
+    - **`default`**: Standard ToolRouter format
+    - **`openai`**: OpenAI-compatible format for use with OpenAI's API
+    - **`anthropic`**: Anthropic-compatible format for use with Claude API
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="tools" type="array">
+  Array of tool objects formatted according to the specified schema
+  
+  <Expandable title="Default Schema Tool Object">
+    <ResponseField name="name" type="string">
+      Unique name/identifier for the tool
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Description of what the tool does
+    </ResponseField>
+    
+    <ResponseField name="input_schema" type="object">
+      JSON schema defining the tool's input parameters
+    </ResponseField>
+    
+    <ResponseField name="server" type="string">
+      Server name that provides this tool
+    </ResponseField>
+  </Expandable>
+  
+  <Expandable title="OpenAI Schema Tool Object">
+    <ResponseField name="type" type="string">
+      Always "function" for OpenAI format
+    </ResponseField>
+    
+    <ResponseField name="function" type="object">
+      Function definition object
+      
+      <Expandable title="Function Object">
+        <ResponseField name="name" type="string">
+          Function name
+        </ResponseField>
+        
+        <ResponseField name="description" type="string">
+          Function description
+        </ResponseField>
+        
+        <ResponseField name="parameters" type="object">
+          JSON schema for function parameters
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+  
+  <Expandable title="Anthropic Schema Tool Object">
+    <ResponseField name="name" type="string">
+      Tool name
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Tool description
+    </ResponseField>
+    
+    <ResponseField name="input_schema" type="object">
+      JSON schema for tool input
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+### Default Format
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/tools" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+response = requests.get(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/tools",
+    headers=headers
+)
+
+tools = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/tools', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+});
+
+const tools = await response.json();
+```
+
+</CodeGroup>
+
+### OpenAI Format
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/tools?schema=openai" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+params = {
+    "schema": "openai"
+}
+
+response = requests.get(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/tools",
+    headers=headers,
+    params=params
+)
+
+openai_tools = response.json()
+```
+
+</CodeGroup>
+
+### Anthropic Format
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/tools?schema=anthropic" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY"
+}
+
+params = {
+    "schema": "anthropic"
+}
+
+response = requests.get(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/tools",
+    headers=headers,
+    params=params
+)
+
+anthropic_tools = response.json()
+```
+
+</CodeGroup>
+
+## Example Responses
+
+### Default Format
+
+```json
+{
+  "tools": [
+    {
+      "name": "gmail_send_email",
+      "description": "Send an email through Gmail",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "List of recipient email addresses"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Email subject"
+          },
+          "body": {
+            "type": "string",
+            "description": "Email body content"
+          }
+        },
+        "required": ["to", "subject", "body"]
+      },
+      "server": "gmail"
+    },
+    {
+      "name": "linear_create_issue",
+      "description": "Create a new issue in Linear",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Issue title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Issue description"
+          },
+          "teamId": {
+            "type": "string",
+            "description": "Team ID"
+          }
+        },
+        "required": ["title", "teamId"]
+      },
+      "server": "linear"
+    }
+  ]
+}
+```
+
+### OpenAI Format
+
+```json
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "gmail_send_email",
+        "description": "Send an email through Gmail",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "to": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "List of recipient email addresses"
+            },
+            "subject": {
+              "type": "string",
+              "description": "Email subject"
+            },
+            "body": {
+              "type": "string",
+              "description": "Email body content"
+            }
+          },
+          "required": ["to", "subject", "body"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "linear_create_issue",
+        "description": "Create a new issue in Linear",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Issue title"
+            },
+            "description": {
+              "type": "string",
+              "description": "Issue description"
+            },
+            "teamId": {
+              "type": "string",
+              "description": "Team ID"
+            }
+          },
+          "required": ["title", "teamId"]
+        }
+      }
+    }
+  ]
+}
+```
+
+### Anthropic Format
+
+```json
+{
+  "tools": [
+    {
+      "name": "gmail_send_email",
+      "description": "Send an email through Gmail",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "List of recipient email addresses"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Email subject"
+          },
+          "body": {
+            "type": "string",
+            "description": "Email body content"
+          }
+        },
+        "required": ["to", "subject", "body"]
+      }
+    },
+    {
+      "name": "linear_create_issue",
+      "description": "Create a new issue in Linear",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Issue title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Issue description"
+          },
+          "teamId": {
+            "type": "string",
+            "description": "Team ID"
+          }
+        },
+        "required": ["title", "teamId"]
+      }
+    }
+  ]
+}
+```
+
+## Integration Examples
+
+### Using with OpenAI
+
+```python
+import openai
+import requests
+
+# Get tools in OpenAI format
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+tools_response = requests.get(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/tools?schema=openai",
+    headers=headers
+)
+tools = tools_response.json()["tools"]
+
+# Use with OpenAI chat completions
+response = openai.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Send an email to john@example.com"}],
+    tools=tools
+)
+```
+
+### Using with Anthropic
+
+```python
+import anthropic
+import requests
+
+# Get tools in Anthropic format
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+tools_response = requests.get(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/tools?schema=anthropic",
+    headers=headers
+)
+tools = tools_response.json()["tools"]
+
+# Use with Anthropic API
+client = anthropic.Anthropic()
+response = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    tools=tools,
+    messages=[{"role": "user", "content": "Send an email to john@example.com"}]
+)
+```
+
+## Use Cases
+
+- **AI Integration**: Get tools in the format needed for your AI framework
+- **Dynamic Tool Discovery**: Programmatically discover available tools in a stack
+- **Application Setup**: Configure your application with the tools available in a stack
+- **Documentation Generation**: Generate tool documentation for your applications
+
+## Error Responses
+
+<ResponseField name="401 Unauthorized">
+  Invalid or missing API key
+  
+  ```json
+  {
+    "detail": "Unauthorized"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="404 Not Found">
+  Stack not found
+  
+  ```json
+  {
+    "detail": "Stack not found"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="429 Too Many Requests">
+  Rate limit exceeded
+  
+  ```json
+  {
+    "detail": "Too many requests"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  Server error occurred
+  
+  ```json
+  {
+    "detail": "Failed to get tools"
+  }
+  ```
+</ResponseField> 

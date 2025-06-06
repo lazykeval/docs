@@ -1,0 +1,79 @@
+---
+title: 'Authentication'
+description: 'Learn how to authenticate with the ToolRouter Account Management API'
+---
+
+## Overview
+
+The ToolRouter Account Management API uses API key authentication to secure access to your account resources. These endpoints allow you to programmatically manage your ToolRouter stacks, servers, credentials, and tools.
+
+<Note>
+  Account Management API endpoints are different from Stack Specific endpoints. They require an API key generated from your dashboard rather than a stack token.
+</Note>
+
+## Authentication Method
+
+All Account Management API requests must include an API key in the `Authorization` header:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Getting Your API Key
+
+To use the Account Management API, you need to generate an API key from your ToolRouter dashboard:
+
+1. Log into your [ToolRouter Dashboard](https://app.toolrouter.ai)
+2. Navigate to your account settings
+3. Generate a new API key
+4. Copy and securely store your API key
+
+<Warning>
+  Screenshot placeholder: API key generation interface
+</Warning>
+
+## Base URL
+
+All Account Management API endpoints use the following base URL:
+
+```
+https://api.toolrouter.ai/v1
+```
+
+## Rate Limiting
+
+The Account Management API implements rate limiting to ensure fair usage:
+
+- **Most endpoints**: 60 requests per minute
+- **Stack creation/updates**: 30 requests per minute  
+- **Tool invocation**: 20 requests per minute
+
+Rate limit headers are included in all responses:
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Requests remaining in current window
+- `X-RateLimit-Reset`: Time when the rate limit resets
+
+## Error Responses
+
+The API returns standard HTTP status codes and JSON error responses:
+
+```json
+{
+  "detail": "Error description message"
+}
+```
+
+Common error codes:
+- `400`: Bad Request - Invalid request parameters
+- `401`: Unauthorized - Invalid or missing API key
+- `404`: Not Found - Resource doesn't exist
+- `429`: Too Many Requests - Rate limit exceeded
+- `500`: Internal Server Error - Server-side error
+
+## Example Request
+
+```bash
+curl -X GET "https://api.toolrouter.ai/v1/stacks" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+``` 

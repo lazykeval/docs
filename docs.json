@@ -54,10 +54,48 @@
             ]
           },
           {
-            "group": "Endpoints",
+            "group": "Stack Specific Endpoints",
             "pages": [
               "api-reference/endpoint/list_tools",
               "api-reference/endpoint/call_tool"
+            ]
+          },
+          {
+            "group": "Account Management API",
+            "pages": [
+              "api-reference/endpoint/account/authentication"
+            ]
+          },
+          {
+            "group": "Stack Management",
+            "pages": [
+              "api-reference/endpoint/account/list_stacks",
+              "api-reference/endpoint/account/create_stack",
+              "api-reference/endpoint/account/update_stack",
+              "api-reference/endpoint/account/delete_stack"
+            ]
+          },
+          {
+            "group": "Server Management",
+            "pages": [
+              "api-reference/endpoint/account/list_servers",
+              "api-reference/endpoint/account/add_server_to_stack",
+              "api-reference/endpoint/account/remove_server_from_stack",
+              "api-reference/endpoint/account/update_server_tools"
+            ]
+          },
+          {
+            "group": "Credentials Management",
+            "pages": [
+              "api-reference/endpoint/account/get_credentials_status",
+              "api-reference/endpoint/account/update_credentials"
+            ]
+          },
+          {
+            "group": "Tools Management",
+            "pages": [
+              "api-reference/endpoint/account/list_stack_tools",
+              "api-reference/endpoint/account/invoke_tool"
             ]
           },
           {

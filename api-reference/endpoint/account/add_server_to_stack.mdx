@@ -1,0 +1,287 @@
+---
+title: 'Add Server to Stack'
+description: 'Add a server from the marketplace to your stack'
+---
+
+## Overview
+
+Adds a server from the ToolRouter marketplace to an existing stack. You can specify which tools to enable when adding the server, or enable all tools at once.
+
+## Endpoint
+
+```
+POST https://api.toolrouter.ai/v1/stacks/{stack_id}/servers
+```
+
+## Authentication
+
+This endpoint requires an API key. Include it in the Authorization header:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Path Parameters
+
+<ParamField path="stack_id" type="string" required>
+  The unique identifier of the stack to add the server to
+</ParamField>
+
+## Request Body
+
+<ParamField body="server_id" type="string" required>
+  The unique identifier of the server to add to the stack
+</ParamField>
+
+<ParamField body="enable_all_tools" type="boolean" default="false">
+  Whether to enable all available tools for this server
+</ParamField>
+
+<ParamField body="enabled_tools" type="array">
+  Array of specific tool IDs to enable. Only used if `enable_all_tools` is false.
+  
+  <Expandable title="Tool Selection">
+    - If `enable_all_tools` is `true`, all tools from the server will be enabled
+    - If `enable_all_tools` is `false` and `enabled_tools` is provided, only those tools will be enabled
+    - If `enable_all_tools` is `false` and `enabled_tools` is not provided, no tools will be enabled initially
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="message" type="string">
+  Confirmation message indicating the server was added successfully and how many tools were enabled
+</ResponseField>
+
+## Example Request
+
+### Add Server with All Tools Enabled
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "server_id": "gmail",
+    "enable_all_tools": true
+  }'
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "server_id": "gmail",
+    "enable_all_tools": True
+}
+
+response = requests.post(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers",
+    headers=headers,
+    json=data
+)
+
+result = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    server_id: "gmail",
+    enable_all_tools: true
+  })
+});
+
+const result = await response.json();
+```
+
+</CodeGroup>
+
+### Add Server with Specific Tools
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "server_id": "gmail",
+    "enable_all_tools": false,
+    "enabled_tools": ["gmail_send_email", "gmail_search_emails"]
+  }'
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "server_id": "gmail",
+    "enable_all_tools": False,
+    "enabled_tools": ["gmail_send_email", "gmail_search_emails"]
+}
+
+response = requests.post(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers",
+    headers=headers,
+    json=data
+)
+
+result = response.json()
+```
+
+</CodeGroup>
+
+### Add Server with No Tools (Configure Later)
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "server_id": "gmail",
+    "enable_all_tools": false
+  }'
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "server_id": "gmail",
+    "enable_all_tools": False
+}
+
+response = requests.post(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers",
+    headers=headers,
+    json=data
+)
+
+result = response.json()
+```
+
+</CodeGroup>
+
+## Example Responses
+
+### All Tools Enabled
+
+```json
+{
+  "message": "Server gmail added to stack stack_123e4567-e89b-12d3-a456-426614174000 with 5 tools enabled"
+}
+```
+
+### Specific Tools Enabled
+
+```json
+{
+  "message": "Server gmail added to stack stack_123e4567-e89b-12d3-a456-426614174000 with 2 tools enabled"
+}
+```
+
+### No Tools Enabled
+
+```json
+{
+  "message": "Server gmail added to stack stack_123e4567-e89b-12d3-a456-426614174000 with 0 tools enabled"
+}
+```
+
+## Workflow
+
+After adding a server to a stack:
+
+1. **Configure credentials**: Use the [Update Credentials](/api-reference/endpoint/account/update_credentials) endpoint to add required credentials
+2. **Enable/disable tools**: Use the [Update Server Tools](/api-reference/endpoint/account/update_server_tools) endpoint to modify enabled tools
+3. **Test tools**: Use the [Invoke Tool](/api-reference/endpoint/account/invoke_tool) endpoint to test functionality
+
+## Error Responses
+
+<ResponseField name="400 Bad Request">
+  Server already exists in stack or invalid parameters
+  
+  ```json
+  {
+    "detail": "Server gmail already exists in stack"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="401 Unauthorized">
+  Invalid or missing API key
+  
+  ```json
+  {
+    "detail": "Unauthorized"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="404 Not Found">
+  Stack or server not found
+  
+  ```json
+  {
+    "detail": "Stack not found"
+  }
+  ```
+  
+  ```json
+  {
+    "detail": "Server gmail not found"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="429 Too Many Requests">
+  Rate limit exceeded
+  
+  ```json
+  {
+    "detail": "Too many requests"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  Server error occurred
+  
+  ```json
+  {
+    "detail": "Failed to add server to stack"
+  }
+  ```
+</ResponseField>
+
+## Best Practices
+
+- **Check server availability**: Use the [List Servers](/api-reference/endpoint/account/list_servers) endpoint to see available servers and their tools
+- **Plan tool selection**: Review tool descriptions and parameters before enabling
+- **Start with specific tools**: Consider enabling only the tools you need rather than all tools
+- **Configure credentials early**: Add required credentials immediately after adding the server 

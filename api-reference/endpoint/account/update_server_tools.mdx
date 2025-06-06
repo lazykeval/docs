@@ -1,0 +1,297 @@
+---
+title: 'Update Server Tools'
+description: 'Enable or disable specific tools for a server in your stack'
+---
+
+## Overview
+
+Updates the enabled tools for a server that's already added to your stack. You can enable additional tools, disable existing tools, or completely change which tools are active.
+
+## Endpoint
+
+```
+PUT https://api.toolrouter.ai/v1/stacks/{stack_id}/servers/{server_id}/tools
+```
+
+## Authentication
+
+This endpoint requires an API key. Include it in the Authorization header:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Path Parameters
+
+<ParamField path="stack_id" type="string" required>
+  The unique identifier of the stack containing the server
+</ParamField>
+
+<ParamField path="server_id" type="string" required>
+  The unique identifier of the server to update
+</ParamField>
+
+## Request Body
+
+<ParamField body="enabled_tools" type="array" required>
+  Array of tool IDs that should be enabled for this server. Tools not in this list will be disabled.
+</ParamField>
+
+<ParamField body="server_configuration" type="object">
+  Optional server-specific configuration settings
+</ParamField>
+
+<Note>
+  This endpoint replaces the current enabled tools list. Only tools specified in `enabled_tools` will remain active.
+</Note>
+
+## Response
+
+<ResponseField name="message" type="string">
+  Confirmation message indicating the tools were updated successfully
+</ResponseField>
+
+## Example Request
+
+### Enable Specific Tools
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail/tools" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "enabled_tools": ["gmail_send_email", "gmail_search_emails", "gmail_read_email"]
+  }'
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "enabled_tools": ["gmail_send_email", "gmail_search_emails", "gmail_read_email"]
+}
+
+response = requests.put(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail/tools",
+    headers=headers,
+    json=data
+)
+
+result = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail/tools', {
+  method: 'PUT',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    enabled_tools: ["gmail_send_email", "gmail_search_emails", "gmail_read_email"]
+  })
+});
+
+const result = await response.json();
+```
+
+</CodeGroup>
+
+### Disable All Tools
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail/tools" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "enabled_tools": []
+  }'
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "enabled_tools": []
+}
+
+response = requests.put(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail/tools",
+    headers=headers,
+    json=data
+)
+
+result = response.json()
+```
+
+</CodeGroup>
+
+### Update Tools with Configuration
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail/tools" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "enabled_tools": ["gmail_send_email"],
+    "server_configuration": {
+      "default_sender": "noreply@example.com",
+      "rate_limit": 100
+    }
+  }'
+```
+
+```python Python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "enabled_tools": ["gmail_send_email"],
+    "server_configuration": {
+        "default_sender": "noreply@example.com",
+        "rate_limit": 100
+    }
+}
+
+response = requests.put(
+    "https://api.toolrouter.ai/v1/stacks/stack_123e4567-e89b-12d3-a456-426614174000/servers/gmail/tools",
+    headers=headers,
+    json=data
+)
+
+result = response.json()
+```
+
+</CodeGroup>
+
+## Example Response
+
+```json
+{
+  "message": "Successfully updated tools for server gmail in stack stack_123e4567-e89b-12d3-a456-426614174000"
+}
+```
+
+## Tool Validation
+
+The API validates that all specified tool IDs exist for the given server:
+
+- **Valid tools**: Only tools available in the server can be enabled
+- **Invalid tools**: The request will fail if any tool ID doesn't exist for the server
+- **Case sensitivity**: Tool IDs are case-sensitive and must match exactly
+
+## Impact on Applications
+
+Updating enabled tools affects applications immediately:
+
+- **Newly enabled tools**: Become available for use in applications
+- **Newly disabled tools**: Will cause errors if applications try to use them
+- **Unchanged tools**: Continue working without interruption
+
+## Common Use Cases
+
+### Enable Additional Tools
+
+Add new tools while keeping existing ones:
+
+1. Get current enabled tools from [List Stacks](/api-reference/endpoint/account/list_stacks)
+2. Add new tool IDs to the list
+3. Update with the combined list
+
+### Disable Specific Tools
+
+Remove specific tools while keeping others:
+
+1. Get current enabled tools from [List Stacks](/api-reference/endpoint/account/list_stacks) 
+2. Remove unwanted tool IDs from the list
+3. Update with the filtered list
+
+### Temporarily Disable All Tools
+
+Set `enabled_tools` to an empty array to disable all tools without removing the server.
+
+## Error Responses
+
+<ResponseField name="400 Bad Request">
+  Invalid tool IDs provided
+  
+  ```json
+  {
+    "detail": "Invalid tool IDs for server gmail: invalid_tool_id, another_invalid_tool"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="401 Unauthorized">
+  Invalid or missing API key
+  
+  ```json
+  {
+    "detail": "Unauthorized"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="404 Not Found">
+  Stack, server, or server not found in stack
+  
+  ```json
+  {
+    "detail": "Stack not found"
+  }
+  ```
+  
+  ```json
+  {
+    "detail": "Server gmail not found in stack stack_123e4567-e89b-12d3-a456-426614174000"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="429 Too Many Requests">
+  Rate limit exceeded
+  
+  ```json
+  {
+    "detail": "Too many requests"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  Server error occurred
+  
+  ```json
+  {
+    "detail": "Failed to update server tools"
+  }
+  ```
+</ResponseField>
+
+## Best Practices
+
+- **Check available tools**: Use [List Servers](/api-reference/endpoint/account/list_servers) to see all available tools for a server
+- **Gradual updates**: When making significant changes, consider updating tools gradually
+- **Test after updates**: Verify critical tools still work after making changes
+- **Monitor applications**: Watch for errors in applications that might be affected by the changes
+</rewritten_file> 
